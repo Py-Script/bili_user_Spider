@@ -135,7 +135,7 @@ def get_GetINnfo(mid):
                 'sign': data.get('sign')
             }
             print('用户个人信息:{}'.format(result))
-            #save_user_json(result)
+            save_user_json(result)
 
         else:
             print('获取用户个人信息失败,code {}'.format(req.status_code))
@@ -271,15 +271,15 @@ def save_followers_json(result):
     将关注或粉丝mid保存至json
     """
     result = [result]
-    with open('list.json', 'r', encoding='utf-8') as fi:
+    """with open('list.json', 'r', encoding='utf-8') as fi:
         st = fi.read()
         data = json.loads(st)
         m = data.get('mid')
-        print(m)
-    """with open('list.json', 'a', encoding='utf-8') as f:
+        print(m)"""
+    with open('list.json', 'a', encoding='utf-8') as f:
         f.write(json.dumps(result, indent=2, ensure_ascii=False))
         f.close()
-        print('mid保存成功')"""
+        print('mid保存成功')
         
 
 def save_user_json(result):
@@ -302,14 +302,14 @@ def run(mid):
     # 获取关注数量和粉丝数量
     f, g = get_myinfo(mid)
 
-    """# 获取所有关注用户信息
+    # 获取所有关注用户信息
     f_g_ps = 50
     f_g_pn = int(g / f_g_ps)+1
     if f_g_pn <= 1:
         get_followers(mid, 1, f_g_ps)
     else:
         for g_pn in range(1, f_g_pn):
-            get_followings(mid, g_pn, f_g_ps)"""
+            get_followings(mid, g_pn, f_g_ps)
     
     # 获取所有粉丝用户信息
     f_r_ps = 50
