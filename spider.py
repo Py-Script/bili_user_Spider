@@ -33,71 +33,6 @@ def get_space(mid):
     except ConnectionError:
         pass
 
-def get_Sublist(mid):
-    """
-    获取用户订阅标签内容
-    :param mid: 用户ID
-    """
-    try:
-        headers = {
-            'Cookie': 'finger=edc6ecda; LIVE_BUVID=AUTO2115358816933697; fts=1535889908; sid=hvigwhgz; DedeUserID=10047741; DedeUserID__ckMd5=ece5181ea73c3b76; SESSDATA=5892a772%2C1538481904%2Ca0bf2d94; bili_jct=5dd829ab21ad7d606a04cf0249a29579; stardustvideo=1; CURRENT_FNVAL=8; buvid3=1468A13B-AB50-4895-9697-B514F0F4BC7B6684infoc; rpdid=oloiimsossdosksqlwwqw; _dfcaptcha=bbee0b745b1ea7249886e07bdf1fed68; UM_distinctid=165a3008d49b5-0faf4d2bbdefc2-323b5b03-1fa400-165a3008d4a2bc; CNZZDATA2724999=cnzz_eid%3D418608190-1536036965-https%253A%252F%252Fwww.bilibili.com%252F%26ntime%3D1536036965; im_notify_type_10047741=0; bp_t_offset_10047741=15977794596451862',
-            'Host': 'space.bilibili.com'
-        }
-        url = 'https://space.bilibili.com/ajax/tags/getSubList?mid=' + str(mid)
-        print('bili用户订阅标签url:{}'.format(url))
-        req = SESSION.get(url, headers=headers)
-        if req.status_code == 200:
-            #print('成功获取到用户订阅标签内容: {}'.format(req.json()))
-            status = req.json()
-            data = status.get('data')
-            count = data.get('count')
-            print('用户订阅标签数量:{}'.format(count))
-            tags = data.get('tags')
-            for item in tags:
-                su = {
-                    'name': item.get('name'),
-                    'tag_id': item.get('tag_id'),
-                    'updated_ts': item.get('updated_ts')
-                }
-                print('订阅标签内容:{}'.format(su))
-            #return count,tags
-        else:
-            print('获取用户订阅标签失败,code {}'.format(req.status_code))
-    except ConnectionError:
-        pass
-
-def get_SubmitVideos(mid, page, pagesize):
-    """
-    获取用户投稿视频信息
-    :param mid: 用户ID
-    :param page: 页数
-    :param pagesize: 每页数量
-    """
-    try:
-        url = 'https://space.bilibili.com/ajax/member/getSubmitVideos?mid=' + str(mid) + '&page=' + str(page) + '&pagesize=' + str(pagesize)
-        print('用户投稿视频信息url:{}'.format(url))
-        req = SESSION.get(url)
-        if req.status_code == 200:
-            print('获取用户投稿视频信息成功')
-            status = req.json()
-            data = status.get('data')
-            count = data.get('count')
-            vlist = data.get('vlist')
-            for item in vlist:
-                vlt = {
-                    'aid': item.get('aid'),
-                    'description': item.get('description'),
-                    'length': item.get('length'),
-                    'title': item.get('title'),
-                    'play': item.get('play'),
-                }
-                print('用户投稿视频数量:{}, 用户投稿视频信息:{}'.format(count, vlt))
-            #print('用户投稿视频数量:{}, 用户投稿视频信息:{}'.format(count, vlist))
-            #return count,vlist
-        else:
-            print('获取用户投稿视频信息失败,code {}'.format(req.status_code))
-    except ConnectionError:
-        pass
 
 
 def get_GetINnfo(mid):
@@ -207,6 +142,7 @@ def get_followings(mid, pn, ps):
                 }
                 print(result)
                 get_space(result.get('mid'))
+                save_followers_json(result)
                 #return result
                 
         else:
@@ -243,9 +179,9 @@ def get_followers(mid, pn, ps):
                     'mid' : i.get('mid') 
                 }
                 print(result)
-                get_space(result)
+                get_space(result.get('mid'))
                 save_followers_json(result)
-
+                
         else:
             print('获取所有粉丝用户信息失败 code:{}'.format(req.status_code))
     
@@ -255,7 +191,7 @@ def get_followers(mid, pn, ps):
 
 def save_followers_mongodb(result):
     """
-    将关注或粉丝mid保存至mongodb
+    将关注和粉丝mid保存至mongodb
     """
     client = pymongo.MongoClient(host='localhost',port=27017)
     db = client.bilibili
@@ -268,7 +204,7 @@ def save_followers_mongodb(result):
 
 def save_followers_json(result):
     """
-    将关注或粉丝mid保存至json
+    将关注和粉丝mid保存至json
     """
     result = [result]
     """with open('list.json', 'r', encoding='utf-8') as fi:
@@ -321,13 +257,6 @@ def run(mid):
         for r_pn in range(1, f_r_pn): 
             get_followers(mid, r_pn, f_r_ps)
 
-    """# 获取用户订阅标签数量,名称
-    get_Sublist(mid)"""
-
-    """# 获取用户投稿视频数量,信息
-    page = 1
-    pagesize = 25
-    get_SubmitVideos(mid, page, pagesize)"""
     
     
 if __name__ == '__main__':
