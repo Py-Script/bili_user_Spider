@@ -13,6 +13,7 @@ git clone https://github.com/cexll/bili_user_Spider.git
 - requests
 - pymongo
 - mongodb
+
 使用本脚本请先安装好MongoDB,并且安装好库
 ```
 pip install -r requirements.txt
@@ -29,7 +30,7 @@ python3 spider.py
 **程序的大致思路是这样,通过mid进入用户主目录,然后获取用户个人信息并保存到数据库,然后获取用户的粉丝数量以及关注数量方便之后计算页数,下一步获取所有的关注用户mid以及粉丝用户mid保存到数据库,然后依次提取数据库mid进入用户主目录循环至结束**
 
 ### 运行过程
-![](img/1.png)
+![](img/1.PNG)
 
 ### 数据来源
 数据通过`bilibili`官方`api`获取除了获取`个人信息`必须要进入`用户目录`才能成功获取其他都可直接通过`API`获取到数据
