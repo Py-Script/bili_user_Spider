@@ -3,9 +3,9 @@ import time
 import json
 
 import pymongo
+from requests.exceptions import ConnectionError
 
-
-COOKIE = '这里填写自己的cookie'
+COOKIE = '这里填写自己的Cookie'
 
 # 连接MongoDB
 client = pymongo.MongoClient(host='localhost',port=27017)
@@ -36,8 +36,8 @@ def get_space(mid):
                    
         else:
             print('进入bili用户主页失败,code {}'.format(req.status_code))
-    except ConnectionError:
-        pass
+    except ConnectionError as e:
+        print('ConnectionError网络异常', e.args)
 
 
 
@@ -83,8 +83,8 @@ def get_GetINnfo(mid):
         else:
             print('获取用户个人信息失败,code {}'.format(req.status_code))
     
-    except ConnectionError:
-        pass
+    except ConnectionError as e:
+        print('ConnectionError网络异常', e.args)
 
 
 
@@ -118,8 +118,8 @@ def get_myinfo(mid):
 
         else:
             print('get_myinfo url失败 code:{}'.format(req.status_code))
-    except ConnectionError:
-        pass
+    except ConnectionError as e:
+        print('ConnectionError网络异常', e.args)
 
 
 def get_followings(mid, pn, ps):
@@ -160,8 +160,8 @@ def get_followings(mid, pn, ps):
         else:
             print('获取关注用户信息失败 code:{}'.format(req.status_code))
     
-    except ConnectionError:
-        pass
+    except ConnectionError as e:
+        print('ConnectionError网络异常', e.args)
 
 
 def get_followers(mid, pn, ps):
@@ -201,8 +201,8 @@ def get_followers(mid, pn, ps):
                 
         else:
             print('获取所有粉丝用户信息失败 code:{}'.format(req.status_code)) 
-    except ConnectionError:
-        pass
+    except ConnectionError as e:
+        print('ConnectionError网络异常', e.args)
 
 
 
@@ -281,12 +281,12 @@ def rep_run():
         result.append(x)
     # 最大数
     max = len(result)
-    if MIN <= max:
-        run(result[MIN].get('mid'))
-    else:
+    if MIN > max:
         print('程序即将停止运行,所有信息爬取完成')
         time.sleep(10)
-        exit()
+        exit()  
+    else:
+        run(result[MIN].get('mid'))
 
 
   
