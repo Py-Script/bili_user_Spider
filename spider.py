@@ -5,7 +5,7 @@ import json
 import pymongo
 
 
-
+COOKIE = 'inger=edc6ecda; LIVE_BUVID=AUTO2115358816933697; fts=1535889908; sid=hvigwhgz; DedeUserID=10047741; DedeUserID__ckMd5=ece5181ea73c3b76; SESSDATA=5892a772%2C1538481904%2Ca0bf2d94; bili_jct=5dd829ab21ad7d606a04cf0249a29579; stardustvideo=1; CURRENT_FNVAL=8; buvid3=1468A13B-AB50-4895-9697-B514F0F4BC7B6684infoc; rpdid=oloiimsossdosksqlwwqw; _dfcaptcha=bbee0b745b1ea7249886e07bdf1fed68; UM_distinctid=165a3008d49b5-0faf4d2bbdefc2-323b5b03-1fa400-165a3008d4a2bc; CNZZDATA2724999=cnzz_eid%3D418608190-1536036965-https%253A%252F%252Fwww.bilibili.com%252F%26ntime%3D1536036965; im_notify_type_10047741=0; bp_t_offset_10047741=159777945964518621'
 
 # 连接MongoDB
 client = pymongo.MongoClient(host='localhost',port=27017)
@@ -24,7 +24,7 @@ def get_space(mid):
             'Host': 'space.bilibili.com',
             'Referer': 'https://www.bilibili.com/',
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
-            'Cookie': 'inger=edc6ecda; LIVE_BUVID=AUTO2115358816933697; fts=1535889908; sid=hvigwhgz; DedeUserID=10047741; DedeUserID__ckMd5=ece5181ea73c3b76; SESSDATA=5892a772%2C1538481904%2Ca0bf2d94; bili_jct=5dd829ab21ad7d606a04cf0249a29579; stardustvideo=1; CURRENT_FNVAL=8; buvid3=1468A13B-AB50-4895-9697-B514F0F4BC7B6684infoc; rpdid=oloiimsossdosksqlwwqw; _dfcaptcha=bbee0b745b1ea7249886e07bdf1fed68; UM_distinctid=165a3008d49b5-0faf4d2bbdefc2-323b5b03-1fa400-165a3008d4a2bc; CNZZDATA2724999=cnzz_eid%3D418608190-1536036965-https%253A%252F%252Fwww.bilibili.com%252F%26ntime%3D1536036965; im_notify_type_10047741=0; bp_t_offset_10047741=159777945964518621'
+            'Cookie': COOKIE
         }
         url = 'https://space.bilibili.com/' + str(mid)
         print('bili用户主页url:{}'.format(url))
@@ -33,11 +33,9 @@ def get_space(mid):
             print('成功进入用户主页')
             # 获取用户个人信息
             get_GetINnfo(mid)
-            
-            
+                   
         else:
             print('进入bili用户主页失败,code {}'.format(req.status_code))
-
     except ConnectionError:
         pass
 
@@ -79,6 +77,7 @@ def get_GetINnfo(mid):
                     'sign': data.get('sign')
                 }
                 print('用户个人信息:{}'.format(result))
+                # 得到用户个人信息保存到数据库
                 save_GetINnfo_mongodb(result)
 
         else:
@@ -91,20 +90,20 @@ def get_GetINnfo(mid):
 
 def get_myinfo(mid):
     """
-    获取用户所有关注数量和粉丝数量
+    获取用户关注数量和粉丝数量
     :param mid: 用户ID
     :return: 返回关注数量和粉丝数量
     """
     try:
         headers = {
             'Connection': 'keep-alive',
-            'Cookie': 'inger=edc6ecda; LIVE_BUVID=AUTO2115358816933697; fts=1535889908; sid=hvigwhgz; DedeUserID=10047741; DedeUserID__ckMd5=ece5181ea73c3b76; SESSDATA=5892a772%2C1538481904%2Ca0bf2d94; bili_jct=5dd829ab21ad7d606a04cf0249a29579; stardustvideo=1; CURRENT_FNVAL=8; buvid3=1468A13B-AB50-4895-9697-B514F0F4BC7B6684infoc; rpdid=oloiimsossdosksqlwwqw; _dfcaptcha=bbee0b745b1ea7249886e07bdf1fed68; UM_distinctid=165a3008d49b5-0faf4d2bbdefc2-323b5b03-1fa400-165a3008d4a2bc; CNZZDATA2724999=cnzz_eid%3D418608190-1536036965-https%253A%252F%252Fwww.bilibili.com%252F%26ntime%3D1536036965; im_notify_type_10047741=0; bp_t_offset_10047741=159777945964518621',
+            'Cookie': COOKIE,
             'Host': 'api.bilibili.com',
             'Referer': 'https://space.bilibili.com/' + str(mid),
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
         }
         url = 'https://api.bilibili.com/x/space/myinfo?jsonp=jsonp'
-        print('获取用户所有关注数量和粉丝数量url:{}'.format(url))
+        print('获取用户关注数量和粉丝数量url:{}'.format(url))
         req = SESSION.get(url, headers=headers)
         if req.status_code == 200:
             status = req.json()
@@ -119,14 +118,13 @@ def get_myinfo(mid):
 
         else:
             print('get_myinfo url失败 code:{}'.format(req.status_code))
-
     except ConnectionError:
         pass
 
 
 def get_followings(mid, pn, ps):
     """
-    获取所有关注用户信息
+    获取关注用户信息
     :param mid: 用户ID
     :param pn: 页数
     :param ps: 每页数量
@@ -134,13 +132,13 @@ def get_followings(mid, pn, ps):
     try:
         headers = {
             'Connection': 'keep-alive',
-            'Cookie': 'finger=edc6ecda; LIVE_BUVID=AUTO2115358816933697; fts=1535889908; sid=hvigwhgz; DedeUserID=10047741; DedeUserID__ckMd5=ece5181ea73c3b76; SESSDATA=5892a772%2C1538481904%2Ca0bf2d94; bili_jct=5dd829ab21ad7d606a04cf0249a29579; stardustvideo=1; CURRENT_FNVAL=8; buvid3=1468A13B-AB50-4895-9697-B514F0F4BC7B6684infoc; rpdid=oloiimsossdosksqlwwqw; _dfcaptcha=bbee0b745b1ea7249886e07bdf1fed68; UM_distinctid=165a3008d49b5-0faf4d2bbdefc2-323b5b03-1fa400-165a3008d4a2bc; im_notify_type_10047741=0; bp_t_offset_10047741=159777945964518621',
+            'Cookie': COOKIE,
             'Host': 'api.bilibili.com',
             'Referer': 'https://space.bilibili.com/' + str(mid),
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
         }
         url = 'https://api.bilibili.com/x/relation/followings?vmid=' + str(mid) + '&pn=' + str(pn) + '&ps=' + str(ps) + '&order=desc&jsonp=jsonp'
-        print('获取所有关注用户信息url:{}'.format(url))
+        print('获取关注用户信息url:{}'.format(url))
         req = SESSION.get(url, headers=headers)
         if req.status_code == 200:
             code = req.json()
@@ -152,14 +150,15 @@ def get_followings(mid, pn, ps):
                         'mid': i.get('mid')
                     }
                     print(result)
+                    # 得到mid进入用户主页面
                     get_space(result.get('mid'))
-                    #save_followers_json(result)
+                    # 保存关注用户的mid到数据库
                     save_followers_mongodb(result)
             else:
                 print('限制只访问前5页')
                 
         else:
-            print('获取所有关注用户信息失败 code:{}'.format(req.status_code))
+            print('获取关注用户信息失败 code:{}'.format(req.status_code))
     
     except ConnectionError:
         pass
@@ -167,7 +166,7 @@ def get_followings(mid, pn, ps):
 
 def get_followers(mid, pn, ps):
     """
-    获取所有粉丝用户信息
+    获取粉丝用户信息
     :param mid: 用户ID
     :param pn: 页数
     :param ps: 每页数量
@@ -175,13 +174,13 @@ def get_followers(mid, pn, ps):
     try:
         headers = {
             'Connection': 'keep-alive',
-            'Cookie': 'finger=edc6ecda; LIVE_BUVID=AUTO2115358816933697; fts=1535889908; sid=hvigwhgz; DedeUserID=10047741; DedeUserID__ckMd5=ece5181ea73c3b76; SESSDATA=5892a772%2C1538481904%2Ca0bf2d94; bili_jct=5dd829ab21ad7d606a04cf0249a29579; stardustvideo=1; CURRENT_FNVAL=8; buvid3=1468A13B-AB50-4895-9697-B514F0F4BC7B6684infoc; rpdid=oloiimsossdosksqlwwqw; _dfcaptcha=bbee0b745b1ea7249886e07bdf1fed68; UM_distinctid=165a3008d49b5-0faf4d2bbdefc2-323b5b03-1fa400-165a3008d4a2bc; im_notify_type_10047741=0; bp_t_offset_10047741=159777945964518621',
+            'Cookie': COOKIE,
             'Host': 'api.bilibili.com',
             'Referer': 'https://space.bilibili.com/' + str(mid),
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
         }
         url = 'https://api.bilibili.com/x/relation/followers?vmid=' + str(mid) + '&pn=' + str(pn) + '&ps=' + str(ps) + '&order=desc&jsonp=jsonp'
-        print('获取所有粉丝用户信息url:{}'.format(url))
+        print('获取粉丝用户信息url:{}'.format(url))
         req = SESSION.get(url, headers=headers)
         if req.status_code == 200:
             code = req.json()
@@ -193,19 +192,17 @@ def get_followers(mid, pn, ps):
                         'mid' : i.get('mid') 
                     }
                     print(result)
+                    # 得到mid进入用户主页面
                     get_space(result.get('mid'))
-                    #save_followers_json(result)
+                    # 保存粉丝用户mid到数据库
                     save_followers_mongodb(result)
                 else:
                     print('限制只访问前5页')
                 
         else:
-            print('获取所有粉丝用户信息失败 code:{}'.format(req.status_code))
-    
+            print('获取所有粉丝用户信息失败 code:{}'.format(req.status_code)) 
     except ConnectionError:
         pass
-
-
 
 
 
@@ -235,7 +232,6 @@ def save_GetINnfo_mongodb(result):
         print('{}用户保存到数据库成功'.format(result.get('name')))
 
 
-
 def run(mid):
     """
     运行函数
@@ -247,7 +243,7 @@ def run(mid):
     # 获取关注数量和粉丝数量
     f, g = get_myinfo(mid)
 
-    # 获取所有关注用户信息
+    # 获取关注用户信息
     f_g_ps = 50
     f_g_pn = int(g / f_g_ps)+1
     if f_g_pn <= 1:
@@ -256,7 +252,7 @@ def run(mid):
         for g_pn in range(1, f_g_pn):
             get_followings(mid, g_pn, f_g_ps)
     
-    # 获取所有粉丝用户信息
+    # 获取粉丝用户信息
     f_r_ps = 50
     f_r_pn = int(f / f_r_ps)+1
     print(f_r_pn)
@@ -293,8 +289,7 @@ def rep_run():
         exit()
 
 
-
-    
+  
 if __name__ == '__main__':
     # 最好填写自己的mid
     run(2)
