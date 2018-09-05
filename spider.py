@@ -5,7 +5,7 @@ import json
 import pymongo
 
 
-COOKIE = 'inger=edc6ecda; LIVE_BUVID=AUTO2115358816933697; fts=1535889908; sid=hvigwhgz; DedeUserID=10047741; DedeUserID__ckMd5=ece5181ea73c3b76; SESSDATA=5892a772%2C1538481904%2Ca0bf2d94; bili_jct=5dd829ab21ad7d606a04cf0249a29579; stardustvideo=1; CURRENT_FNVAL=8; buvid3=1468A13B-AB50-4895-9697-B514F0F4BC7B6684infoc; rpdid=oloiimsossdosksqlwwqw; _dfcaptcha=bbee0b745b1ea7249886e07bdf1fed68; UM_distinctid=165a3008d49b5-0faf4d2bbdefc2-323b5b03-1fa400-165a3008d4a2bc; CNZZDATA2724999=cnzz_eid%3D418608190-1536036965-https%253A%252F%252Fwww.bilibili.com%252F%26ntime%3D1536036965; im_notify_type_10047741=0; bp_t_offset_10047741=159777945964518621'
+COOKIE = '这里填写自己的cookie'
 
 # 连接MongoDB
 client = pymongo.MongoClient(host='localhost',port=27017)
