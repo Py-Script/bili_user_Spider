@@ -98,12 +98,12 @@ def rep_run():
         result.append(x)
     # 最大数
     max = len(result)
-    if MIN <= max:
-        run(result[MIN].get('mid'))
-    else:
+    if MIN > max:
         print('程序即将停止运行,所有信息爬取完成')
         time.sleep(10)
-        exit()
+        exit()  
+    else:
+        run(result[MIN].get('mid'))
 ```
 
 
