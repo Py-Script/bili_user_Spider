@@ -28,7 +28,7 @@ def get_space(mid):
         }
         url = 'https://space.bilibili.com/' + str(mid)
         print('bili用户主页url:{}'.format(url))
-        req = SESSION.get(url, headers=headers)
+        req = SESSION.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
             print('成功进入用户主页')
             # 获取用户个人信息
@@ -60,7 +60,7 @@ def get_GetINnfo(mid):
         }
         url = 'https://space.bilibili.com/ajax/member/GetInfo'
 
-        req = SESSION.post(url, headers=headers, data=data)
+        req = SESSION.post(url, headers=headers, data=data, timeout=60)
         if req.status_code == 200:
             print('获取用户个人信息成功')
             status = req.json()
@@ -104,7 +104,7 @@ def get_myinfo(mid):
         }
         url = 'https://api.bilibili.com/x/space/myinfo?jsonp=jsonp'
         print('获取用户关注数量和粉丝数量url:{}'.format(url))
-        req = SESSION.get(url, headers=headers)
+        req = SESSION.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
             status = req.json()
             if status.get('data'):
@@ -139,7 +139,7 @@ def get_followings(mid, pn, ps):
         }
         url = 'https://api.bilibili.com/x/relation/followings?vmid=' + str(mid) + '&pn=' + str(pn) + '&ps=' + str(ps) + '&order=desc&jsonp=jsonp'
         print('获取关注用户信息url:{}'.format(url))
-        req = SESSION.get(url, headers=headers)
+        req = SESSION.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
             code = req.json()
             if code.get('data'):
@@ -181,7 +181,7 @@ def get_followers(mid, pn, ps):
         }
         url = 'https://api.bilibili.com/x/relation/followers?vmid=' + str(mid) + '&pn=' + str(pn) + '&ps=' + str(ps) + '&order=desc&jsonp=jsonp'
         print('获取粉丝用户信息url:{}'.format(url))
-        req = SESSION.get(url, headers=headers)
+        req = SESSION.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
             code = req.json()
             if code.get('data'):
