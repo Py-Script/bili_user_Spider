@@ -5,7 +5,7 @@ import json
 import pymongo
 from requests.exceptions import ConnectionError
 
-COOKIE = '这里填写自己的cookie'
+COOKIE = '这里填写自己的Cookie'
 
 # 连接MongoDB
 client = pymongo.MongoClient(host='localhost',port=27017)
@@ -13,6 +13,8 @@ db = client.bilibili_user
 
 
 MIN = 0
+MID = 0
+
 
 def get_space(mid):
     """
@@ -211,9 +213,11 @@ def save_followers_mongodb(result):
     """
     将关注和粉丝mid保存至mongodb
     """
-    
+    global MID
+    MID += 1
+    result['id'] = MID
     collection = db.list
-    if collection.find_one({'mid':result.get('mid')}):
+    if collection.find_one({'mid': result.get('mid')}):
         print('{}在数据库已存在'.format(result.get('uname')))
     else:
         collection.insert(result)
@@ -276,19 +280,23 @@ def rep_run():
     MIN += 1
     collection = db.list
     # 查询数据库所有数据保存到result
-    ran = collection.find({})
-    result = []
-    for x in ran:
-        result.append(x)
-    # 最大数
-    max = len(result)
-    if MIN > max:
-        print('程序即将停止运行,所有信息爬取完成')
-        time.sleep(10)
-        exit()  
+    if collection.find({'id': MIN}):
+        ran = collection.find({'id': MIN})
+        # 查询数据库有多少条
+        count = collection.find({}).count()
+        
+        result = []
+        for x in ran:
+            result.append(x)
+
+        if MIN > count:
+            print('程序即将停止运行,所有信息爬取完成')
+            time.sleep(10)
+            exit()  
+        else:
+            run(result[0].get('mid'))
     else:
-        run(result[MIN].get('mid'))
-        del result[:]
+        print('数据库没有该数据 id: {}'.format(MIN))
 
 
   
