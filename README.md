@@ -104,6 +104,7 @@ def rep_run():
         exit()  
     else:
         run(result[MIN].get('mid'))
+        del result[:]
 ```
 
 
