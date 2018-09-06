@@ -27,9 +27,10 @@ def get_space(mid):
             'Cookie': COOKIE
         }
         url = 'https://space.bilibili.com/' + str(mid)
-        print('bili用户主页url:{}'.format(url))
+        
         req = requests.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
+            print('bili用户主页url:{}'.format(url))
             print('成功进入用户主页')
             # 获取用户个人信息
             get_GetINnfo(mid)
