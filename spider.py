@@ -217,14 +217,14 @@ def save_followers_mongodb(result):
     global MID
     MID += 1
     collection = db.list
-    if collection.find_one({'id': MID}):
-        print('数据库已存在该id {}'.format(MID))
-        save_followers_mongodb(result)
-        return None
+    
+    result['id'] = MID
+    if collection.find_one({'mid': result.get('mid')}):
+        print('{} 在数据库已存在'.format(result.get('uname')))
     else:
-        result['id'] = MID
-        if collection.find_one({'mid': result.get('mid')}):
-            print('{} 在数据库已存在'.format(result.get('uname')))
+        if collection.find_one({'id': MID}):
+            print('数据库已存在该id {}'.format(MID))
+            save_followers_mongodb(result)
         else:
             collection.insert(result)
             print('{} 保存到数据库成功'.format(result.get('uname')))
@@ -286,20 +286,17 @@ def rep_run():
     MIN += 1
     collection = db.list
     # 查询数据库所有数据保存到result
-    if collection.find({'id': MIN}):
-        ran = collection.find({'id': MIN})
+    if collection.find_one({'id': MIN}):
+        ran = collection.find_one({'id': MIN})
         # 查询数据库有多少条
         count = collection.find({}).count()
-
-        for x in ran:
-            mid = x.get('mid')
 
         if MIN > count:
             print('程序即将停止运行,所有信息爬取完成')
             time.sleep(10)
             exit()
         else:
-            run(mid)
+            run(ran.get('mid'))
     else:
         print('数据库没有该数据 id: {}'.format(MIN))
 
