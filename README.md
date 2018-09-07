@@ -96,19 +96,19 @@ def rep_run():
         ran = collection.find({'id': MIN})
         # 查询数据库有多少条
         count = collection.find({}).count()
-        
-        result = []
+
         for x in ran:
-            result.append(x)
+            mid = x.get('mid')
 
         if MIN > count:
             print('程序即将停止运行,所有信息爬取完成')
             time.sleep(10)
-            exit()  
+            exit()
         else:
-            run(result[0].get('mid'))
+            run(mid)
     else:
         print('数据库没有该数据 id: {}'.format(MIN))
+
 ```
 
 
