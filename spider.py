@@ -8,7 +8,7 @@ from requests.exceptions import ConnectionError
 COOKIE = '这里填写自己的Cookie'
 
 # 连接MongoDB
-client = pymongo.MongoClient(host='localhost',port=27017)
+client = pymongo.MongoClient(host='localhost', port=27017)
 db = client.bilibili_user
 
 
@@ -29,19 +29,18 @@ def get_space(mid):
             'Cookie': COOKIE
         }
         url = 'https://space.bilibili.com/' + str(mid)
-        
+
         req = requests.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
             print('bili用户主页url:{}'.format(url))
             print('成功进入用户主页')
             # 获取用户个人信息
             get_GetINnfo(mid)
-                   
+
         else:
             print('进入bili用户主页失败,code {}'.format(req.status_code))
     except ConnectionError as e:
         print('ConnectionError网络异常', e.args)
-
 
 
 def get_GetINnfo(mid):
@@ -70,7 +69,7 @@ def get_GetINnfo(mid):
             if status.get('data'):
                 data = status.get('data')
                 regtimez = time.localtime(data.get('regtime'))
-                regtime=time.strftime("%Y-%m-%d %H:%M:%S", regtimez)
+                regtime = time.strftime("%Y-%m-%d %H:%M:%S", regtimez)
                 result = {
                     'mid': data.get('mid'),
                     'name': data.get('name'),
@@ -85,10 +84,9 @@ def get_GetINnfo(mid):
 
         else:
             print('获取用户个人信息失败,code {}'.format(req.status_code))
-    
+
     except ConnectionError as e:
         print('ConnectionError网络异常', e.args)
-
 
 
 def get_myinfo(mid):
@@ -140,7 +138,9 @@ def get_followings(mid, pn, ps):
             'Referer': 'https://space.bilibili.com/' + str(mid),
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
         }
-        url = 'https://api.bilibili.com/x/relation/followings?vmid=' + str(mid) + '&pn=' + str(pn) + '&ps=' + str(ps) + '&order=desc&jsonp=jsonp'
+        url = 'https://api.bilibili.com/x/relation/followings?vmid=' + \
+            str(mid) + '&pn=' + str(pn) + '&ps=' + \
+            str(ps) + '&order=desc&jsonp=jsonp'
         print('获取关注用户信息url:{}'.format(url))
         req = requests.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
@@ -159,10 +159,10 @@ def get_followings(mid, pn, ps):
                     save_followers_mongodb(result)
             else:
                 print('限制只访问前5页')
-                
+
         else:
             print('获取关注用户信息失败 code:{}'.format(req.status_code))
-    
+
     except ConnectionError as e:
         print('ConnectionError网络异常', e.args)
 
@@ -182,7 +182,9 @@ def get_followers(mid, pn, ps):
             'Referer': 'https://space.bilibili.com/' + str(mid),
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
         }
-        url = 'https://api.bilibili.com/x/relation/followers?vmid=' + str(mid) + '&pn=' + str(pn) + '&ps=' + str(ps) + '&order=desc&jsonp=jsonp'
+        url = 'https://api.bilibili.com/x/relation/followers?vmid=' + \
+            str(mid) + '&pn=' + str(pn) + '&ps=' + \
+            str(ps) + '&order=desc&jsonp=jsonp'
         print('获取粉丝用户信息url:{}'.format(url))
         req = requests.get(url, headers=headers, timeout=60)
         if req.status_code == 200:
@@ -191,8 +193,8 @@ def get_followers(mid, pn, ps):
                 glist = code.get('data').get('list')
                 for i in glist:
                     result = {
-                        'uname' : i.get('uname'),
-                        'mid' : i.get('mid') 
+                        'uname': i.get('uname'),
+                        'mid': i.get('mid')
                     }
                     print(result)
                     # 得到mid进入用户主页面
@@ -201,12 +203,11 @@ def get_followers(mid, pn, ps):
                     save_followers_mongodb(result)
                 else:
                     print('限制只访问前5页')
-                
+
         else:
-            print('获取所有粉丝用户信息失败 code:{}'.format(req.status_code)) 
+            print('获取所有粉丝用户信息失败 code:{}'.format(req.status_code))
     except ConnectionError as e:
         print('ConnectionError网络异常', e.args)
-
 
 
 def save_followers_mongodb(result):
@@ -215,13 +216,18 @@ def save_followers_mongodb(result):
     """
     global MID
     MID += 1
-    result['id'] = MID
     collection = db.list
-    if collection.find_one({'mid': result.get('mid')}):
-        print('{}在数据库已存在'.format(result.get('uname')))
+    if collection.find_one({'id': MID}):
+        print('数据库已存在该id {}'.format(MID))
+        save_followers_mongodb(result)
+        return None
     else:
-        collection.insert(result)
-        print('{}保存到数据库成功'.format(result.get('uname')))
+        result['id'] = MID
+        if collection.find_one({'mid': result.get('mid')}):
+            print('{} 在数据库已存在'.format(result.get('uname')))
+        else:
+            collection.insert(result)
+            print('{} 保存到数据库成功'.format(result.get('uname')))
 
 
 def save_GetINnfo_mongodb(result):
@@ -231,17 +237,17 @@ def save_GetINnfo_mongodb(result):
 
     collection = db.myinfo
     if collection.find_one({'mid': result.get('mid')}):
-        print('{}用户在数据库已存在'.format(result.get('name')))
+        print('{} 用户在数据库已存在'.format(result.get('name')))
     else:
         collection.insert(result)
-        print('{}用户保存到数据库成功'.format(result.get('name')))
+        print('{} 用户保存到数据库成功'.format(result.get('name')))
 
 
 def run(mid):
     """
     运行函数
     """
-    
+
     # 进入用户主页
     get_space(mid)
 
@@ -256,7 +262,7 @@ def run(mid):
     else:
         for g_pn in range(1, f_g_pn):
             get_followings(mid, g_pn, f_g_ps)
-    
+
     # 获取粉丝用户信息
     f_r_ps = 50
     f_r_pn = int(f / f_r_ps)+1
@@ -264,7 +270,7 @@ def run(mid):
     if f_r_pn <= 1:
         get_followers(mid, 1, f_r_ps)
     else:
-        for r_pn in range(1, f_r_pn): 
+        for r_pn in range(1, f_r_pn):
             get_followers(mid, r_pn, f_r_ps)
 
     # 循环
@@ -284,22 +290,20 @@ def rep_run():
         ran = collection.find({'id': MIN})
         # 查询数据库有多少条
         count = collection.find({}).count()
-        
-        result = []
+
         for x in ran:
-            result.append(x)
+            mid = x.get('mid')
 
         if MIN > count:
             print('程序即将停止运行,所有信息爬取完成')
             time.sleep(10)
-            exit()  
+            exit()
         else:
-            run(result[0].get('mid'))
+            run(mid)
     else:
         print('数据库没有该数据 id: {}'.format(MIN))
 
 
-  
 if __name__ == '__main__':
     # 最好填写自己的mid
-    run(2)
+    run(10047741)
