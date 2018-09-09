@@ -6,7 +6,7 @@
 git clone https://github.com/cexll/bili_user_Spider.git
 ```
 ### 运行环境
-- Windows/Ubuntu
+- Ubuntu
 - Python 3.6
 - VSCode
 ### 依赖
