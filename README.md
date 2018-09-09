@@ -6,13 +6,13 @@
 git clone https://github.com/cexll/bili_user_Spider.git
 ```
 ### 运行环境
-- Windows/Ubuntu
+- Ubuntu
 - Python 3.6
 - VSCode
 ### 依赖
 - requests
-- pymongo
-- mongodb
+- pymysql
+- mysql
 
 使用本脚本请先安装好MongoDB,并且安装好库
 ```
@@ -49,7 +49,7 @@ def run(mid):
     """
     运行函数
     """
-    
+
     # 进入用户主页
     get_space(mid)
 
@@ -63,8 +63,8 @@ def run(mid):
         get_followers(mid, 1, f_g_ps)
     else:
         for g_pn in range(1, f_g_pn):
-            get_followings(mid, g_pn, f_g_ps)
-    
+          get_followings(mid, g_pn, f_g_ps)
+
     # 获取粉丝用户信息
     f_r_ps = 50
     f_r_pn = int(f / f_r_ps)+1
@@ -72,16 +72,18 @@ def run(mid):
     if f_r_pn <= 1:
         get_followers(mid, 1, f_r_ps)
     else:
-        for r_pn in range(1, f_r_pn): 
+        for r_pn in range(1, f_r_pn):
             get_followers(mid, r_pn, f_r_ps)
 
-    # 循环
-    rep_run()
+    # 提取一个mid继续运行
+    rep_mid = rep_run()
+    if rep_mid:
+        return run(rep_mid)
 ```
 
 核心代码
 
-这里`MIN`必须要先初始值,就设置了一个全局变量,进入`rep_run`,`MIN`变量加一,连接`list`数据库,查询数据库所有信息保存到`result`,`max`是从数据库提取出来的信息最大`count`,接下来判断`MIN`是否大于`max`,如果大于则说明数据库数据已经运行完了,直接结束脚本,如果不大于则继续循环
+这里`MIN`必须要先初始值,就设置了一个全局变量,进入`rep_run`,`MIN`变量加一,连接`list`数据库,查询数据库count保存到`count`,判断`MIN`是否大于`count`,如果大于则说明数据库数据已经运行完了,直接结束脚本,如果不大于则继续循环
 ```python
 def rep_run():
     """
@@ -90,25 +92,27 @@ def rep_run():
     global MIN
     # 每次运行此函数使MIN加一,不能大于max(数据库count)
     MIN += 1
-    collection = db.list
-    # 查询数据库所有数据保存到result
-    if collection.find({'id': MIN}):
-        ran = collection.find({'id': MIN})
-        # 查询数据库有多少条
-        count = collection.find({}).count()
-
-        for x in ran:
-            mid = x.get('mid')
-
-        if MIN > count:
+    cursor = db.cursor()
+    # 执行SQL得到COUNT
+    sql = "SELECT COUNT(id) FROM `list`"
+    cursor.execute(sql)
+    r = cursor.fetchone()
+    if r:
+        for i in r:
+            ir = i
+        # 判断count是否小于MIN,如果小于则停止程序
+        if ir < MIN:
             print('程序即将停止运行,所有信息爬取完成')
             time.sleep(10)
+            db.close()
             exit()
         else:
-            run(mid)
-    else:
-        print('数据库没有该数据 id: {}'.format(MIN))
-
+            sql = "SELECT `mid` FROM `list` WHERE id=%d" % (MIN)
+            cursor.execute(sql)
+            r = cursor.fetchone()
+            if r:
+                for i in r:
+                    return i
 ```
 
 
