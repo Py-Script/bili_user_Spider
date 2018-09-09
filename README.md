@@ -81,7 +81,7 @@ def run(mid):
         return run(rep_mid)
 ```
 
-核心代码
+## 核心代码
 
 这里`MIN`必须要先初始值,就设置了一个全局变量,进入`rep_run`,`MIN`变量加一,连接`list`数据库,查询数据库count保存到`count`,判断`MIN`是否大于`count`,如果大于则说明数据库数据已经运行完了,直接结束脚本,如果不大于则继续循环
 ```python
