@@ -5,7 +5,7 @@ import pymysql
 
 from requests.exceptions import ConnectionError
 
-COOKIE = '填写自己的cookie'
+COOKIE = ''
 
 # 连接MySQL
 db = pymysql.connect(host='', user='', password='', db='')
@@ -32,9 +32,7 @@ def get_space(mid):
             print('bili用户主页url:{}'.format(url))
             print('成功进入用户主页')
             # 获取用户个人信息
-            result = get_GetINnfo(mid)
-            return result
-
+            get_GetINnfo(mid)
         else:
             print('进入bili用户主页失败,code {}'.format(req.status_code))
     except ConnectionError as e:
@@ -77,8 +75,7 @@ def get_GetINnfo(mid):
                     'sign': data.get('sign')
                 }
                 print('用户个人信息:{}'.format(result))
-                return result
-
+                save_GetINnfo_mysql(result)
         else:
             print('获取用户个人信息失败,code {}'.format(req.status_code))
 
@@ -151,8 +148,7 @@ def get_followings(mid, pn, ps):
                     }
                     print(result)
                     # 得到mid进入用户主页面
-                    result = get_space(result.get('mid'))
-                    save_GetINnfo_mysql(result)
+                    get_space(result.get('mid'))
                     # 保存关注用户的mid到数据库
                     save_followers_mysql(result)
             else:
@@ -196,8 +192,7 @@ def get_followers(mid, pn, ps):
                     }
                     print(result)
                     # 得到mid进入用户主页面
-                    result = get_space(result.get('mid'))
-                    save_GetINnfo_mysql(result)
+                    get_space(result.get('mid'))
                     # 保存粉丝用户mid到数据库
                     save_followers_mysql(result)
                 else:
@@ -268,9 +263,7 @@ def run(mid):
     """
 
     # 进入用户主页
-    myinfo_result = get_space(mid)
-    # 保存用户个人信息到数据库
-    save_GetINnfo_mysql(myinfo_result)
+    get_space(mid)
 
     # 获取关注数量和粉丝数量
     f, g = get_myinfo(mid)
