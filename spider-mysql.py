@@ -75,7 +75,6 @@ def get_GetINnfo(mid):
                 }
                 print('用户个人信息:{}'.format(result))
                 save_GetINnfo_mysql(result)
-            return None
         else:
             print('获取用户个人信息失败,code {}'.format(req.status_code))
 
@@ -111,7 +110,6 @@ def get_myinfo(mid):
                 following = data.get('following')
                 print('关注数量:{}, 粉丝数量:{}'.format(following, follower))
                 return follower, following
-            return None
 
         else:
             print('get_myinfo url失败 code:{}'.format(req.status_code))
@@ -202,7 +200,6 @@ def get_followers(mid, pn, ps):
                     save_followers_mysql(result)
                 else:
                     print('限制只访问前5页')
-            return None
 
         else:
             print('获取所有粉丝用户信息失败 code:{}'.format(req.status_code))
@@ -228,11 +225,10 @@ def save_followers_mysql(result):
                     ir = i
                 if ir == mid:
                     print('数据库已存在该mid {}'.format(r))
-                else:
-                    sql = """INSERT INTO `list` (`mid`, `name`) VALUES (%d, "%s")""" % (mid, name)
-                    cursor.execute(sql)
-                    print('{} 关注粉丝保存到数据库成功'.format(result))
-            return None
+            else:
+                sql = """INSERT INTO `list` (`mid`, `name`) VALUES (%d, "%s")""" % (mid, name)
+                cursor.execute(sql)
+                print('{} 关注粉丝保存到数据库成功'.format(result))
     finally:
         db.commit()
 
@@ -257,12 +253,11 @@ def save_GetINnfo_mysql(result):
                     ir = i
                 if ir == mid:
                     print('数据库已存在该用户 {}'.format(r))
-                else:
-                    sql = """INSERT INTO `myinfo` (`mid`, `name`, `sex`, `regtime`, `birthday`, `sign`) VALUES (%d, "%s","%s", "%s","%s", "%s")""" % (
-                        mid, name, sex, regtime, birthday, pymysql.escape_string(sign))
-                    cursor.execute(sql)
-                    print('{} 用户信息保存到数据库成功'.format(result))
-            return None
+            else:
+                sql = """INSERT INTO `myinfo` (`mid`, `name`, `sex`, `regtime`, `birthday`, `sign`) VALUES (%d, "%s","%s", "%s","%s", "%s")""" % (
+                    mid, name, sex, regtime, birthday, pymysql.escape_string(sign))
+                cursor.execute(sql)
+                print('{} 用户信息保存到数据库成功'.format(result))
     finally:
         db.commit()
 
@@ -332,7 +327,6 @@ def rep_run():
                 if r:
                     for i in r:
                         return i
-        return None
     except ReadTimeout as e:
         print('达到递归深度', e)
         time.sleep(5)
@@ -340,10 +334,9 @@ def rep_run():
 
 if __name__ == '__main__':
     # 最好填写自己的mid
-    #run(10047741)
     start = time.time()
     MMID = rep_run()
-    with Pool(5) as p:
+    with Pool(10) as p:
         p.map(run, [10047741])
     end = time.time()
     print(end - start)
