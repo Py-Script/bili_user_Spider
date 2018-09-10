@@ -2,16 +2,14 @@ import requests
 import time
 import json
 import pymysql
-
+from config import *
 from requests.exceptions import ConnectionError, ReadTimeout, ConnectTimeout
 from multiprocessing import Pool
-COOKIE = ''
 
 # 连接MySQL
-db = pymysql.connect(host='', user='', password='', db='')
+db = pymysql.connect(host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASSWORD, db=MYSQL_DB)
 
 MIN = 0
-
 
 def get_space(mid):
     """
@@ -333,12 +331,10 @@ def rep_run():
 
 
 if __name__ == '__main__':
-    # 最好填写自己的mid
+    
     start = time.time()
     MMID = rep_run()
     with Pool(10) as p:
-        p.map(run, [10047741])
+        p.map(run, [USERMID])
     end = time.time()
     print(end - start)
-    
-    
