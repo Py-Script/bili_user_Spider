@@ -18,12 +18,18 @@ git clone https://github.com/cexll/bili_user_Spider.git
 ```
 pip install -r requirements.txt
 ```
-运行脚本前请确保数据库创建好数据库和数据表
+**运行脚本前请确保数据库创建好数据库和数据表**
+
+
+**创建数据库**
 ```
-创建数据库
 CREATE DATABASE bilibili;
-创建数据表,这里需要两个
-这一个数据表存储用户信息
+```
+**创建数据表,这里需要两个**
+
+
+**这一个数据表存储用户信息**
+```
 CREATE TABLE `myinfo` (
     `id` int(18) NOT NULL AUTO_INCREMENT,
     `mid` int(18) NOT NULL,
@@ -35,7 +41,9 @@ CREATE TABLE `myinfo` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
 AUTO_INCREMENT=1 ;
-这一个数据表存储mid
+```
+**这一个数据表存储mid**
+```
 CREATE TABLE `list` (
     `id` int(18) NOT NULL AUTO_INCREMENT,
     `mid` int(18),
@@ -46,6 +54,7 @@ AUTO_INCREMENT=1 ;
 ```
 
 打开`config.py`
+
 ```
 # 用户MID
 USERMID = 填写自己bilibili的MID
@@ -79,8 +88,14 @@ python3 spider.py
 运行函数,首选进入用户主页然后获取个人信息到数据库
 
 然后获取粉丝数量以及关注数量
+
+
 50 为api最多能获得的数据
+
+
 通过`关注数量 / 50` 得到页数, 这里做了如果结果`小于或等于1`那么就直接当1,不然`range(1, 1)`是无法运行的
+
+
 这次使用了多进程
 ```python
 def run(mid):
