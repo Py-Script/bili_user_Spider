@@ -31,7 +31,7 @@ def get_space(mid):
             print('bili用户主页url:{}'.format(url))
             print('成功进入用户主页')
             # 获取用户个人信息
-            return get_GetINnfo(mid)
+            get_GetINnfo(mid)
         else:
             print('进入bili用户主页失败,code {}'.format(req.status_code))
     except (ConnectionError, ReadTimeout, ConnectTimeout) as e:
@@ -74,7 +74,7 @@ def get_GetINnfo(mid):
                     'sign': data.get('sign')
                 }
                 print('用户个人信息:{}'.format(result))
-                return save_GetINnfo_mysql(result)
+                save_GetINnfo_mysql(result)
             return None
         else:
             print('获取用户个人信息失败,code {}'.format(req.status_code))
@@ -215,10 +215,10 @@ def get_followers(mid, pn, ps):
 def save_followers_mysql(result):
     """
     将关注和粉丝mid保存至mysql
-    """
-    name = result.get('uname')
-    mid = result.get('mid')
+    """  
     try:
+        name = result.get('uname')
+        mid = result.get('mid')
         with db.cursor() as cursor:
             sql = "SELECT `mid` FROM `list` WHERE `mid`='%s'" % (mid)
             cursor.execute(sql)
@@ -241,13 +241,13 @@ def save_GetINnfo_mysql(result):
     """
     将用户个人信息保存到mysql
     """
-    mid = result.get('mid')
-    name = result.get('name')
-    sex = result.get('sex')
-    regtime = result.get('regtime')
-    birthday = result.get('birthday')
-    sign = result.get('sign')
     try:
+        mid = result.get('mid')
+        name = result.get('name')
+        sex = result.get('sex')
+        regtime = result.get('regtime')
+        birthday = result.get('birthday')
+        sign = result.get('sign')
         with db.cursor() as cursor:
             sql = "SELECT `mid` FROM `myinfo` WHERE `mid`='%s'" % (mid)
             cursor.execute(sql)
@@ -271,34 +271,36 @@ def run(mid):
     """
     运行函数
     """
+    try:
+        # 进入用户主页
+        get_space(mid)
 
-    # 进入用户主页
-    get_space(mid)
+        # 获取关注数量和粉丝数量
+        f, g = get_myinfo(mid)
 
-    # 获取关注数量和粉丝数量
-    f, g = get_myinfo(mid)
+        # 获取关注用户信息
+        f_g_ps = 50
+        f_g_pn = int(g / f_g_ps)+1
+        if f_g_pn <= 1:
+            get_followers(mid, 1, f_g_ps)
+        else:
+            for g_pn in range(1, f_g_pn):
+                get_followings(mid, g_pn, f_g_ps)
 
-    # 获取关注用户信息
-    f_g_ps = 50
-    f_g_pn = int(g / f_g_ps)+1
-    if f_g_pn <= 1:
-        get_followers(mid, 1, f_g_ps)
-    else:
-        for g_pn in range(1, f_g_pn):
-          get_followings(mid, g_pn, f_g_ps)
+        # 获取粉丝用户信息
+        f_r_ps = 50
+        f_r_pn = int(f / f_r_ps)+1
+        if f_r_pn <= 1:
+            get_followers(mid, 1, f_r_ps)
+        else:
+            for r_pn in range(1, f_r_pn):
+                get_followers(mid, r_pn, f_r_ps)
 
-    # 获取粉丝用户信息
-    f_r_ps = 50
-    f_r_pn = int(f / f_r_ps)+1
-    print(f_r_pn)
-    if f_r_pn <= 1:
-        get_followers(mid, 1, f_r_ps)
-    else:
-        for r_pn in range(1, f_r_pn):
-            get_followers(mid, r_pn, f_r_ps)
-
-    # 提取一个mid继续运行
-    return run(rep_run())
+        # 提取一个mid继续运行
+        return run(rep_run())
+    except ReadTimeout as e:
+        print('达到递归深度', e)
+        time.sleep(5)
 
 
 def rep_run():
@@ -306,38 +308,43 @@ def rep_run():
     当上一个mid所有事情完成后进入此函数进行循环爬取下一个mid
     """
     global MIN
-    # 每次运行此函数使MIN加一,不能大于max(数据库count)
-    MIN += 1
-    cursor = db.cursor()
-    # 执行SQL得到COUNT
-    sql = "SELECT COUNT(id) FROM `list`"
-    cursor.execute(sql)
-    r = cursor.fetchone()
-    if r:
-        for i in r:
-            ir = i
-        # 判断count是否小于MIN,如果小于则停止程序
-        if ir < MIN:
-            print('程序即将停止运行,所有信息爬取完成')
-            time.sleep(10)
-            db.close()
-            exit()
-        else:
-            sql = "SELECT `mid` FROM `list` WHERE id=%d" % (MIN)
-            cursor.execute(sql)
-            r = cursor.fetchone()
-            if r:
-                for i in r:
-                    return i
-    return None
+    try:
+        # 每次运行此函数使MIN加一,不能大于max(数据库count)
+        MIN += 1
+        cursor = db.cursor()
+        # 执行SQL得到COUNT
+        sql = "SELECT COUNT(id) FROM `list`"
+        cursor.execute(sql)
+        r = cursor.fetchone()
+        if r:
+            for i in r:
+                ir = i
+            # 判断count是否小于MIN,如果小于则停止程序
+            if ir < MIN:
+                print('程序即将停止运行,所有信息爬取完成')
+                time.sleep(10)
+                db.close()
+                exit()
+            else:
+                sql = "SELECT `mid` FROM `list` WHERE id=%d" % (MIN)
+                cursor.execute(sql)
+                r = cursor.fetchone()
+                if r:
+                    for i in r:
+                        return i
+        return None
+    except ReadTimeout as e:
+        print('达到递归深度', e)
+        time.sleep(5)
 
 
 if __name__ == '__main__':
-    
+    # 最好填写自己的mid
+    #run(10047741)
     start = time.time()
     MMID = rep_run()
-    with Pool(5) as p:
-        p.map(run, [MMID])
+    with Pool(15) as p:
+        p.map(run, [10047741])
     end = time.time()
     print(end - start)
     
