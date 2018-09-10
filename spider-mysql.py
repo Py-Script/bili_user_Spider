@@ -343,7 +343,7 @@ if __name__ == '__main__':
     #run(10047741)
     start = time.time()
     MMID = rep_run()
-    with Pool(15) as p:
+    with Pool(5) as p:
         p.map(run, [10047741])
     end = time.time()
     print(end - start)
