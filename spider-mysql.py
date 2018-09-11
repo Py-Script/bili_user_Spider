@@ -6,10 +6,12 @@ from config import *
 from requests.exceptions import ConnectionError, ReadTimeout, ConnectTimeout
 from multiprocessing import Pool
 
+
 # 连接MySQL
 db = pymysql.connect(host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASSWORD, db=MYSQL_DB)
 
 MIN = 0
+
 
 def get_space(mid):
     """
@@ -224,7 +226,7 @@ def save_followers_mysql(result):
                 if ir == mid:
                     print('数据库已存在该mid {}'.format(r))
             else:
-                sql = """INSERT INTO `list` (`mid`, `name`) VALUES (%d, "%s")""" % (mid, name)
+                sql = """INSERT INTO `list` (`mid`, `name`) VALUES (%d, "%s")""" % (mid, pymysql.escape_string(name))
                 cursor.execute(sql)
                 print('{} 关注粉丝保存到数据库成功'.format(result))
     finally:
@@ -253,7 +255,7 @@ def save_GetINnfo_mysql(result):
                     print('数据库已存在该用户 {}'.format(r))
             else:
                 sql = """INSERT INTO `myinfo` (`mid`, `name`, `sex`, `regtime`, `birthday`, `sign`) VALUES (%d, "%s","%s", "%s","%s", "%s")""" % (
-                    mid, name, sex, regtime, birthday, pymysql.escape_string(sign))
+                    mid, pymysql.escape_string(name), sex, regtime, birthday, pymysql.escape_string(sign))
                 cursor.execute(sql)
                 print('{} 用户信息保存到数据库成功'.format(result))
     finally:
@@ -331,10 +333,12 @@ def rep_run():
 
 
 if __name__ == '__main__':
-    
+    # 最好填写自己的mid
     start = time.time()
     MMID = rep_run()
     with Pool(10) as p:
         p.map(run, [USERMID])
     end = time.time()
     print(end - start)
+    
+    
