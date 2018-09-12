@@ -31,10 +31,10 @@ CREATE DATABASE bilibili;
 **这一个数据表存储用户信息**
 ```
 CREATE TABLE `myinfo` (
-    `id` int(18) NOT NULL AUTO_INCREMENT,
-    `mid` int(18) NOT NULL,
+    `id` int(20) NOT NULL AUTO_INCREMENT,
+    `mid` varchar(55) NOT NULL,
     `name` varchar(255) COLLATE utf8_bin,
-    `sex` varchar(20) COLLATE utf8_bin,
+    `sex` varchar(55) COLLATE utf8_bin,
     `regtime` varchar(255) COLLATE utf8_bin,
     `birthday` varchar(255) COLLATE utf8_bin,
     `sign` varchar(255) COLLATE utf8_bin,
@@ -45,8 +45,8 @@ AUTO_INCREMENT=1 ;
 **这一个数据表存储mid**
 ```
 CREATE TABLE `list` (
-    `id` int(18) NOT NULL AUTO_INCREMENT,
-    `mid` int(18),
+    `id` int(20) NOT NULL AUTO_INCREMENT,
+    `mid` varchar(55),
     `name` varchar(255) COLLATE utf8_bin,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
