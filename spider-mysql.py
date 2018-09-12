@@ -230,11 +230,9 @@ def save_followers_mysql(result):
             cursor.execute(sql)
             r = cursor.fetchone()
             if r:
-                for i in r:
-                    if int(i) == int(mid):
-                        print('数据库已存在该mid {}'.format(mid))
+                print('数据库已存在该mid {}'.format(r))
             else:
-                sql = """INSERT INTO `list` (`mid`, `name`) VALUES ("%s", "%s")""" % (mid, pymysql.escape_string(name))
+                sql = "INSERT INTO `list` (`mid`, `name`) VALUES ('%s', '%s')" % (mid, name)
                 cursor.execute(sql)
                 print('{} 关注粉丝保存到数据库成功'.format(mid))
     finally:
@@ -257,12 +255,10 @@ def save_GetINnfo_mysql(result):
             cursor.execute(sql)
             r = cursor.fetchone()
             if r:
-                for i in r:
-                    if int(i) == int(mid):
-                        print('数据库已存在该用户 {}'.format(mid))
+                print('数据库已存在该用户 {}'.format(r))
             else:
                 sql = """INSERT INTO `myinfo` (`mid`, `name`, `sex`, `regtime`, `birthday`, `sign`) VALUES ("%s", "%s","%s", "%s","%s", "%s")""" % (
-                    mid, pymysql.escape_string(name), sex, regtime, birthday, pymysql.escape_string(sign))
+                    mid, name, sex, regtime, birthday, pymysql.escape_string(sign))
                 cursor.execute(sql)
                 print('{} 用户信息保存到数据库成功'.format(mid))
     finally:
@@ -342,4 +338,4 @@ def rep_run():
 if __name__ == '__main__':
 
     with Pool(10) as p:
-        p.map(run, [USERMID])
+        p.map(run, [rep_run()])
