@@ -1,3 +1,4 @@
+import sys
 import requests
 import time
 import json
@@ -6,6 +7,8 @@ from config import *
 from requests.exceptions import ConnectionError, ReadTimeout, ConnectTimeout, ChunkedEncodingError
 from multiprocessing import Pool
 
+# 递归深度原1000 
+sys.setrecursionlimit(1000000)
 
 # 连接MySQL
 db = pymysql.connect(host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASSWORD, db=MYSQL_DB)
@@ -338,4 +341,4 @@ def rep_run():
 if __name__ == '__main__':
 
     with Pool(10) as p:
-        p.map(run, [rep_run()])
+        p.map(run, [USERMID])
