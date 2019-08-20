@@ -28,11 +28,10 @@ Parameters
 
 
 """用户个人信息api
-URL = https://space.bilibili.com/ajax/member/GetInfo
-POST
-Data
+URL = https://api.bilibili.com/x/space/acc/info?mid=10047741
+GET
+Parameters
     mid:10047741
-    csrf: 5dd829ab21ad7d606a04cf0249a29579
 """
 
 """获取myinfo关注数量粉丝数量api
